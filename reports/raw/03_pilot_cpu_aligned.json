@@ -1,0 +1,190 @@
+{
+ "counting": {
+  "counter": {
+   "precision": 0.49606299212598426,
+   "recall": 0.49606299212598426,
+   "n_gold": 381,
+   "n_pred": 381
+  },
+  "designation": {
+   "precision": null,
+   "recall": null,
+   "n_gold": 0,
+   "n_pred": 0
+  },
+  "order": {
+   "precision": null,
+   "recall": null,
+   "n_gold": 0,
+   "n_pred": 0
+  },
+  "interaction": {
+   "precision": 0.4618096357226792,
+   "recall": 0.5339673913043478,
+   "n_gold": 736,
+   "n_pred": 851
+  },
+  "relation": {
+   "precision": null,
+   "recall": null,
+   "n_gold": 0,
+   "n_pred": 0
+  },
+  "hidden": {
+   "precision": 0.0,
+   "recall": null,
+   "n_gold": 0,
+   "n_pred": 3
+  },
+  "slot": {
+   "precision": 0.03255813953488372,
+   "recall": 0.25,
+   "n_gold": 28,
+   "n_pred": 215
+  },
+  "reobservation_agreement": null,
+  "n_reobservations": 0,
+  "goal_consistency": 0.4
+ },
+ "imitation": {
+  "counter": {
+   "precision": null,
+   "recall": null,
+   "n_gold": 0,
+   "n_pred": 0
+  },
+  "designation": {
+   "precision": null,
+   "recall": 0.0,
+   "n_gold": 38,
+   "n_pred": 0
+  },
+  "order": {
+   "precision": null,
+   "recall": 0.0,
+   "n_gold": 143,
+   "n_pred": 0
+  },
+  "interaction": {
+   "precision": 0.0,
+   "recall": 0.0,
+   "n_gold": 225,
+   "n_pred": 67
+  },
+  "relation": {
+   "precision": null,
+   "recall": null,
+   "n_gold": 0,
+   "n_pred": 0
+  },
+  "hidden": {
+   "precision": null,
+   "recall": null,
+   "n_gold": 0,
+   "n_pred": 0
+  },
+  "slot": {
+   "precision": null,
+   "recall": null,
+   "n_gold": 0,
+   "n_pred": 0
+  },
+  "reobservation_agreement": null,
+  "n_reobservations": 0,
+  "goal_consistency": 0.0
+ },
+ "permanence": {
+  "counter": {
+   "precision": null,
+   "recall": null,
+   "n_gold": 0,
+   "n_pred": 0
+  },
+  "designation": {
+   "precision": null,
+   "recall": null,
+   "n_gold": 0,
+   "n_pred": 0
+  },
+  "order": {
+   "precision": null,
+   "recall": null,
+   "n_gold": 0,
+   "n_pred": 0
+  },
+  "interaction": {
+   "precision": 0.8392857142857143,
+   "recall": 0.734375,
+   "n_gold": 128,
+   "n_pred": 112
+  },
+  "relation": {
+   "precision": 0.9903381642512077,
+   "recall": 0.9832134292565947,
+   "n_gold": 417,
+   "n_pred": 414
+  },
+  "hidden": {
+   "precision": null,
+   "recall": null,
+   "n_gold": 0,
+   "n_pred": 0
+  },
+  "slot": {
+   "precision": 0.05128205128205128,
+   "recall": 0.07407407407407407,
+   "n_gold": 135,
+   "n_pred": 195
+  },
+  "reobservation_agreement": 0.8333333333333334,
+  "n_reobservations": 6,
+  "goal_consistency": null
+ },
+ "reference": {
+  "counter": {
+   "precision": 0.42105263157894735,
+   "recall": 0.47761194029850745,
+   "n_gold": 67,
+   "n_pred": 76
+  },
+  "designation": {
+   "precision": 0.9966442953020134,
+   "recall": 0.8583815028901735,
+   "n_gold": 346,
+   "n_pred": 298
+  },
+  "order": {
+   "precision": 0.49214659685863876,
+   "recall": 0.49214659685863876,
+   "n_gold": 191,
+   "n_pred": 191
+  },
+  "interaction": {
+   "precision": 0.9340369393139841,
+   "recall": 0.9358889623265036,
+   "n_gold": 1513,
+   "n_pred": 1516
+  },
+  "relation": {
+   "precision": null,
+   "recall": null,
+   "n_gold": 0,
+   "n_pred": 0
+  },
+  "hidden": {
+   "precision": null,
+   "recall": null,
+   "n_gold": 0,
+   "n_pred": 0
+  },
+  "slot": {
+   "precision": 0.625,
+   "recall": 1.0,
+   "n_gold": 5,
+   "n_pred": 8
+  },
+  "reobservation_agreement": null,
+  "n_reobservations": 0,
+  "goal_consistency": 0.8
+ }
+}

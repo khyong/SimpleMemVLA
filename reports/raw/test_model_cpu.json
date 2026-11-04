@@ -1,0 +1,26 @@
+{
+ "answer": "place the red cube onto the target\nBelief: count picked(red_cube)=1/2 ; #1 picked(red_cube) 3s ago",
+ "seq_len": 866,
+ "no_mask_equal": true,
+ "token_mean_vl_equal": true,
+ "parts": {
+  "subtask_ce": 2.532921075820923,
+  "bg_ce": 10.94068431854248,
+  "bg_tokens": 24.0
+ },
+ "span_mean_ok": true,
+ "subtask_only_changes_action": true,
+ "cond_tokens": {
+  "all": 32,
+  "subtask_only": 7
+ },
+ "grad_finite": true,
+ "losses": {
+  "official": 9.756139755249023,
+  "bg": 9.756139755249023,
+  "vl": 8.838743209838867,
+  "action": 0.9173961877822876,
+  "subtask_only_action": 0.007265911903232336
+ },
+ "pass": true
+}

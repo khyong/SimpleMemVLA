@@ -1,0 +1,24 @@
+{
+ "rule_files": {
+  "simplememvla/bg/unsup/builder.py": "e45e9983d42534b14756d8f816ed692ab66509047fcd38d95fb6a68a23b5d6e5",
+  "simplememvla/bg/unsup/proprio.py": "dabb6cef6ccb847eddc79b48019a10c365391f15efa6dff86ddff6a86d1a4a39",
+  "simplememvla/bg/unsup/visual.py": "344ccf42d4fd3c89ec20f000578bd51b2e4cc50a889673a8186f1a5a5cee1521",
+  "simplememvla/bg/unsup/instruction.py": "ac2fe5738d4a6de491dca26a1a5be6a978b0e21b7b4b7bce3d3eeb7dc163a0ab",
+  "simplememvla/bg/unsup/pilot.py": "5566dc24b9132a139f0618257c36620802c4041d69f053b55f787bb9c048171d",
+  "simplememvla/bg/schema.py": "b35deeeb361bf953b9ecceacec19dd030be95a76508369984991e4ecb3d35e6a",
+  "simplememvla/bg/serialize.py": "9aa440b846856e0089679e9b96115c89bfa174ac2a9aba30c90e8deb79ff510f"
+ },
+ "metric_files": {
+  "simplememvla/bg/unsup/metrics.py": "c755eed87ab70fac816e4c9fff1080c8f28a6f45a72a15e86a65e03c313f8325",
+  "simplememvla/bg/unsup/rescore.py": "dc2ee357bf671607f994ca2b6ec3f51ebf48211ad7f902267f675b55482113d8",
+  "simplememvla/bg/unsup/summarize.py": "074f71b41a8ce18ad8974ef2100d22156c52ccf1e00a98997265684ea95c629f",
+  "simplememvla/bg/oracle_robomme.py": "94fb7be6bd2e011ee95fa29842ee38a9b758eff260e5e11494bad3ccb406cd45"
+ },
+ "models": {
+  "llm": "Qwen/Qwen2.5-7B-Instruct",
+  "owl": "owlv2-base-patch16-ensemble",
+  "sam2": "sam2.1-hiera-small"
+ },
+ "spec": "llm",
+ "note": "2026-11-04 state after pilot v4 (rules tuned on dev episodes); camera from replay; BinFill query 'a square hole'"
+}
