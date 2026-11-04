@@ -1,0 +1,98 @@
+{
+ "BinFill": {
+  "n_compared": 100,
+  "n_no_replay": 0,
+  "max_abs_diff_K": 0.0,
+  "max_abs_diff_extrinsic": 0.0
+ },
+ "ButtonUnmask": {
+  "n_compared": 100,
+  "n_no_replay": 0,
+  "max_abs_diff_K": 0.0,
+  "max_abs_diff_extrinsic": 0.0
+ },
+ "ButtonUnmaskSwap": {
+  "n_compared": 100,
+  "n_no_replay": 0,
+  "max_abs_diff_K": 0.0,
+  "max_abs_diff_extrinsic": 0.0
+ },
+ "InsertPeg": {
+  "n_compared": 100,
+  "n_no_replay": 0,
+  "max_abs_diff_K": 0.0,
+  "max_abs_diff_extrinsic": 0.0
+ },
+ "MoveCube": {
+  "n_compared": 100,
+  "n_no_replay": 0,
+  "max_abs_diff_K": 0.0,
+  "max_abs_diff_extrinsic": 0.0
+ },
+ "PatternLock": {
+  "n_compared": 100,
+  "n_no_replay": 0,
+  "max_abs_diff_K": 0.0,
+  "max_abs_diff_extrinsic": 0.0
+ },
+ "PickHighlight": {
+  "n_compared": 100,
+  "n_no_replay": 0,
+  "max_abs_diff_K": 0.0,
+  "max_abs_diff_extrinsic": 0.0
+ },
+ "PickXtimes": {
+  "n_compared": 100,
+  "n_no_replay": 0,
+  "max_abs_diff_K": 0.0,
+  "max_abs_diff_extrinsic": 0.0
+ },
+ "RouteStick": {
+  "n_compared": 100,
+  "n_no_replay": 0,
+  "max_abs_diff_K": 0.0,
+  "max_abs_diff_extrinsic": 0.0
+ },
+ "StopCube": {
+  "n_compared": 100,
+  "n_no_replay": 0,
+  "max_abs_diff_K": 0.0,
+  "max_abs_diff_extrinsic": 0.0
+ },
+ "SwingXtimes": {
+  "n_compared": 100,
+  "n_no_replay": 0,
+  "max_abs_diff_K": 0.0,
+  "max_abs_diff_extrinsic": 0.0
+ },
+ "VideoPlaceButton": {
+  "n_compared": 100,
+  "n_no_replay": 0,
+  "max_abs_diff_K": 0.0,
+  "max_abs_diff_extrinsic": 0.0
+ },
+ "VideoPlaceOrder": {
+  "n_compared": 100,
+  "n_no_replay": 0,
+  "max_abs_diff_K": 0.0,
+  "max_abs_diff_extrinsic": 0.0
+ },
+ "VideoRepick": {
+  "n_compared": 100,
+  "n_no_replay": 0,
+  "max_abs_diff_K": 0.0,
+  "max_abs_diff_extrinsic": 0.0
+ },
+ "VideoUnmask": {
+  "n_compared": 100,
+  "n_no_replay": 0,
+  "max_abs_diff_K": 0.0,
+  "max_abs_diff_extrinsic": 0.0
+ },
+ "VideoUnmaskSwap": {
+  "n_compared": 100,
+  "n_no_replay": 0,
+  "max_abs_diff_K": 0.0,
+  "max_abs_diff_extrinsic": 0.0
+ }
+}

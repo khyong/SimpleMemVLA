@@ -132,7 +132,7 @@ UnsupBG 코드(`simplememvla/bg/unsup/`)가 무엇을 읽는지 하나씩 확인
 | front 카메라 영상 (256×256) | LeRobot 녹화 데이터 | 정책도 보는 정보 |
 | instruction | LeRobot 녹화 데이터 | 정책도 보는 정보 |
 | demo 경계 | proprio의 관절 도약으로 검출 (`detect_demo_end`) | 녹화의 `demo` flag와 oracle은 쓰지 않음 |
-| 카메라 보정값 K, extrinsic | 시뮬레이터 replay snapshot에서 읽음 (`pilot.episode_cam`) | 아래 (a) |
+| 카메라 보정값 K, extrinsic | freeze v2부터 RoboMME H5 관측값에서 읽음 (`unsup/h5cam.py`, `pilot --cam_dir`). v1까지는 replay snapshot | 아래 (a) |
 | 로봇 base 위치 (x=−0.615), Panda DH, TCP 0.1034 | RoboMME env 코드, Panda URDF 표준값 | 고정 상수 |
 | stick 끝 길이 0.15 m | 시뮬레이터 link 위치에 맞춤 | 아래 (b) |
 | 과제 이름 | dataset metadata | 아래 (c) |
@@ -146,7 +146,14 @@ oracle builder(`oracle_robomme`)와 replay snapshot(물체 pose, segmentation, `
 - 정책 입력에는 없는 값이지만, 장면의 고정 상수다.
 - replay 80개(16과제 × 5 episode)에서 모두 같은 값이었다 (최대 차이 0).
 - FK로 구한 TCP를 이미지에 투영하는 데만 쓴다.
-- 원래 의도는 RoboMME H5의 `setup/front_camera_intrinsic`, `obs/front_camera_extrinsic`을 쓰는 것이다. 지금 이 서버에 H5가 없어서 두 값이 같은지는 **미확인**이다.
+- 2026-11-04까지는 이 값을 oracle 시뮬레이터 replay에서 읽었다. 내용은 장면 상수지만 읽는 경로가 oracle 산출물이라 엄밀하지 않았다.
+- **조치 (freeze v2)**: H5 관측값 `setup/front_camera_intrinsic`(K)과 `timestep_0/obs/front_camera_extrinsic`(episode 첫 관측)을 episode별로 읽도록 바꿨다.
+  - 추출: `python -m simplememvla.bg.unsup.h5cam extract` → `/data2/hoyong/data/smv/cams_h5/<task>.json`
+  - pilot은 `--cam_dir`(H5)를 기본 경로로 쓴다. replay에서 읽는 경로는 `--cam_from_replay`로만 남겼고, v1 이전 pilot을 재현할 때만 쓴다.
+- **H5와 replay 값 비교** (`reports/raw/unsup_cam_h5_vs_replay.json`): 16과제 1,600 episode 모두에서 K와 extrinsic의 최대 절대 차이가 **0**이었다.
+  - H5 안에서도 extrinsic은 episode 내내 변하지 않았다(모든 timestep, 최대 편차 0).
+  - 과제마다 K와 extrinsic이 각각 한 값뿐이었다.
+- dev episode 4개(ep100, 200, 600, 602)에서 H5 값으로 다시 만든 label이 v4 pilot label과 행 단위로 같았다. 값이 같으므로 pilot 수치는 바뀌지 않는다.
 
 **(b) stick 길이**
 - 시뮬레이터 link 위치(privileged)를 보고 상수 하나를 맞췄다.
@@ -199,17 +206,22 @@ label에 privileged 값이 들어간 것은 아니다. 하지만 아래 규칙�
 - 평가 세트는 어떤 held-out 점수도 보기 전에 골랐다. 결과를 본 뒤 다시 뽑지 않는다.
 - 48개 모두 oracle replay가 있음을 확인했다.
 
-**규칙 고정**: `reports/raw/unsup_freeze_v1.json`
+**규칙 고정**: `reports/raw/unsup_freeze_v2.json` (현재 기준). v1은 기록으로 남긴다.
 - 다음을 기록했다.
   - label을 정하는 파일 7개의 sha256: builder, proprio, visual, instruction, pilot, schema, serialize
   - 지표 파일 4개의 sha256
   - 모델 이름: OWLv2-base, SAM2.1-small, Qwen2.5-7B-Instruct
   - spec 종류 = llm
 - `heldout.py verify`는 코드가 하나라도 다르면 종료 코드 1로 멈춘다. 파일 하나를 바꾼 사본으로 이 동작을 확인했다.
-- v1은 현재 상태 그대로다. 카메라 보정값은 아직 replay에서 읽는다. (a)를 H5 값으로 바꾸려면 **held-out을 돌리기 전에** 코드를 고치고 `freeze --out reports/raw/unsup_freeze_v2.json`으로 새로 고정한다.
+- **freeze v2** (`reports/raw/unsup_freeze_v2.json`, held-out 점수를 보기 전인 2026-11-04에 고정):
+  - v1과 같은 항목에 `unsup/h5cam.py`를 더해 label 파일 8개의 sha256을 기록했다.
+  - 바뀐 것은 카메라 보정값을 읽는 경로(`pilot.py`, `builder.py` 주석, `h5cam.py`)뿐이다. 규칙은 바뀌지 않았다.
+  - 현재 코드로 `verify`하면 v2는 통과하고 v1은 `builder.py`, `pilot.py` 불일치로 멈춘다. 의도한 동작이다.
+- `scripts/unsup_heldout_eval.sh`는 기본으로 v2를 쓰고, `CAM_DIR`(H5 보정값)이 필수다. `run.json`에 보정값 파일의 sha256도 남긴다.
+- 남은 privileged 경로는 (b) stick 길이와 (c) 과제 이름이다. 실행 중에는 replay를 채점의 oracle 쪽에서만 읽는다.
 
 **실행**: `scripts/unsup_heldout_eval.sh`
-- 실행 예: `CUDA_VISIBLE_DEVICES=0 OUT=<새 폴더> bash scripts/unsup_heldout_eval.sh`
+- 실행 예: `CUDA_VISIBLE_DEVICES=0 OUT=<새 폴더> CAM_DIR=/data2/hoyong/data/smv/cams_h5 bash scripts/unsup_heldout_eval.sh`
 - 순서:
   1. freeze 확인
   2. replay 확인
