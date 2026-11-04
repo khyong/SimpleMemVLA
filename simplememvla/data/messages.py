@@ -79,6 +79,7 @@ def build_simplememvla_messages(
     camera_labels: dict[str, str],
     subtask: str | None = None,
     history_camera_tags: list[str] | None = None,
+    bg_text: str | None = None,
 ) -> list[dict[str, Any]]:
     if history_camera_tags is None:
         history_camera_tags = list(camera_tags)
@@ -110,5 +111,7 @@ def build_simplememvla_messages(
     )
     messages: list[dict[str, Any]] = [{"role": "user", "content": content}]
     if subtask:
-        messages.append({"role": "assistant", "content": subtask})
+        # BGMemVLA: answer = "<sub-task>\n<bg>...</bg>" when a Belief Graph is given (bg_source != none)
+        answer = f"{subtask}\n{bg_text}" if bg_text else subtask
+        messages.append({"role": "assistant", "content": answer})
     return messages

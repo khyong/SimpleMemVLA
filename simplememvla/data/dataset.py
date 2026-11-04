@@ -55,6 +55,19 @@ def _resolve_delta_timestamps(data_args, ds_meta, offsets, history_keys):
     return delta_timestamps or None
 
 
+def load_bg_texts(path: str | None, source: str) -> dict[tuple[int, int], str]:
+    """BGMemVLA: (episode_index, frame_index) -> bg_text from bg_oracle.parquet / bg_unsup.parquet."""
+    if not path:
+        raise ValueError(f"bg_source={source!r} needs --bg_path (bg_{source}.parquet)")
+    import pyarrow.parquet as pq
+
+    t = pq.read_table(path, columns=["episode_index", "frame_index", "bg_text"])
+    eps = t.column("episode_index").to_pylist()
+    frs = t.column("frame_index").to_pylist()
+    txt = t.column("bg_text").to_pylist()
+    return {(int(e), int(f)): s for e, f, s in zip(eps, frs, txt)}
+
+
 def _flat_bool_column(hf_dataset, name: str) -> np.ndarray:
     col = hf_dataset.data.column(name).combine_chunks()
     if hasattr(col, "flatten") and not isinstance(col, pa.BooleanArray):
@@ -184,6 +197,20 @@ class SimpleMemVLADataset(Dataset):
             key.split(".")[-1] for key in self.history_image_keys
         ]
         self.augmenter = ClipAugmenter() if data_args.image_aug else None
+        self.bg_source = str(getattr(data_args, "bg_source", "none") or "none")
+        self._bg = None
+        if self.bg_source != "none":
+            self._bg = load_bg_texts(getattr(data_args, "bg_path", None), self.bg_source)
+
+    def _get_bg(self, item: dict[str, Any]) -> str | None:
+        if self._bg is None:
+            return None
+        ep = int(torch.as_tensor(item["episode_index"]).reshape(-1)[0])
+        fr = int(torch.as_tensor(item["frame_index"]).reshape(-1)[0])
+        text = self._bg.get((ep, fr))
+        if text is None:
+            raise KeyError(f"no {self.bg_source} BG for episode {ep} frame {fr}")
+        return text
 
     def __len__(self):
         if self._anchor_indices is not None:
@@ -332,6 +359,7 @@ class SimpleMemVLADataset(Dataset):
             camera_labels=self.spec.camera_labels,
             subtask=self._get_subtask(item),
             history_camera_tags=self.history_camera_tags,
+            bg_text=self._get_bg(item),
         )
         return {
             "messages": messages,

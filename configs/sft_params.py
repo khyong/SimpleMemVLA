@@ -55,6 +55,10 @@ class DataArguments:
     subtask_key: str = field(default="subtask")
     subtask_index_key: Optional[str] = field(default=None)
     skip_video_demo_frames: Optional[bool] = field(default=None)
+    # BGMemVLA (opt-in; default "none" keeps the official behaviour byte-identical): append the Belief Graph text
+    # after the sub-task in the assistant answer. bg_path = parquet keyed by (episode_index, frame_index) with bg_text.
+    bg_source: str = field(default="none", metadata={"choices": ["none", "oracle", "unsup"]})
+    bg_path: Optional[str] = field(default=None)
 
     history_video_sec: Optional[float] = field(default=None)
     history_video_fps: Optional[float] = field(default=None)
