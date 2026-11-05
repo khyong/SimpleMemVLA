@@ -53,7 +53,16 @@ def build_model(model_args, config, dtype):
         ck = model_args.init_checkpoint
         backbone_config = AutoConfig.for_model(**dict(config.backbone_config))
         kw = {"attn_implementation": model_args.attn_implementation} if model_args.attn_implementation else {}
-        backbone = AutoModelForImageTextToText.from_config(backbone_config, **kw)
+        # Under ZeRO-3, from_config would build already-partitioned (empty) parameters and the checkpoint could not be
+        # loaded; build the full model here and let deepspeed.initialize partition it afterwards.
+        import transformers.modeling_utils as _mu
+
+        _z3 = _mu.is_deepspeed_zero3_enabled
+        _mu.is_deepspeed_zero3_enabled = lambda: False
+        try:
+            backbone = AutoModelForImageTextToText.from_config(backbone_config, **kw)
+        finally:
+            _mu.is_deepspeed_zero3_enabled = _z3
         for p in backbone.parameters():
             p.data = p.data.to(dtype)
         model = BGSimpleMemVLAForActionPrediction(config=config, backbone=backbone)
