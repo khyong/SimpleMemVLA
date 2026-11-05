@@ -133,8 +133,11 @@ class Perception:
         score >= late_thr (objects entering later are rare; low-score late boxes are mostly re-detections)."""
         torch = self.torch
         clip = [frames[i] for i in sample]
+        # on a GPU the frames and the per-frame tracking state stay in host memory (only placement changes, not the
+        # computation): a long episode's float32 state exceeded 24 GB on an RTX 4090
+        off = {} if str(self.device) == "cpu" else {"video_storage_device": "cpu", "inference_state_device": "cpu"}
         sess = self.sam_proc.init_video_session(video=clip, inference_device=self.device,
-                                                dtype=torch.float32)
+                                                dtype=torch.float32, **off)
         tracks: dict[int, Track] = {}
         next_id = 1
         H, W = frames.shape[1:3]
