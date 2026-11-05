@@ -86,6 +86,11 @@ def main():
     ap.add_argument("--llm", default="Qwen/Qwen2.5-7B-Instruct")
     ap.add_argument("--cam_dir", default=None, help="H5 front-camera calibration (simplememvla.bg.unsup.h5cam)")
     ap.add_argument("--cam_from_replay", action="store_true", help="legacy: calibration from the oracle replay")
+    ap.add_argument("--variant", default=None,
+                    help="JSON with perception overrides (bg/exp/unsup/variants/*.json): owl, sam2, det_thr, "
+                         "redetect_every, min_area, thresh{cat: thr}, query{cat: text}, schedule{base_fps, dense_fps, "
+                         "window_s, causal, events, motion}, stick_from_instruction")
+    ap.add_argument("--tracks_only", action="store_true", help="write tracks only (no rows / metrics vs replay)")
     a = ap.parse_args()
     if bool(a.cam_dir) == a.cam_from_replay:
         ap.error("give exactly one of --cam_dir (H5) or --cam_from_replay (legacy)")
@@ -126,6 +131,16 @@ def main():
                 k += 1
                 if k > 10 * len(lst):
                     break
+    V = json.load(open(a.variant)) if a.variant else {}
+    if V:
+        from simplememvla.bg.unsup import visual as _vis
+
+        _vis.THRESH.update(V.get("thresh", {}))
+        _vis.QUERY.update(V.get("query", {}))
+        a.owl, a.sam2 = V.get("owl", a.owl), V.get("sam2", a.sam2)
+        json.dump(V, open(os.path.join(a.out, "variant.json"), "w"), indent=1)
+    SCH = {"base_fps": 2.0, "dense_fps": 10.0, "window_s": 1.0, "causal": False, "events": True, "motion": True,
+           **V.get("schedule", {})}
     spec_fn = rule_spec if a.spec == "rule" else LLMSpec(a.llm, os.path.join(a.out, "spec_cache.json"), a.device)
     perc = None
     cam_cache: dict = {}
@@ -147,16 +162,22 @@ def main():
         d = np.load(os.path.join(a.npz_dir, f"ep{ep:04d}.npz"), allow_pickle=True)
         S, instr = d["state"], str(d["instruction"])
         spec = spec_fn(instr)
-        stick = task in ("PatternLock", "RouteStick")
+        if V.get("stick_from_instruction"):   # embodiment stated in the instruction (same rule as bg/unsup/generate)
+            stick = "stick attached to the robot" in instr.lower()
+        else:
+            stick = task in ("PatternLock", "RouteStick")
         tr_p = os.path.join(a.out, "tracks", f"ep{ep:04d}.pkl")
         if os.path.exists(tr_p):
             tracks = pickle.load(open(tr_p, "rb"))
         else:
             frames = decode_front(a.root, ep)
             ev = tcp_dwell_events(S) if stick else gripper_events(S)
-            sample = schedule(len(S), [e["frame"] for e in ev], motion_windows(frames))
+            sample = schedule(len(S), [e["frame"] for e in ev] if SCH["events"] else [],
+                              motion_windows(frames) if SCH["motion"] else None, base_fps=SCH["base_fps"],
+                              dense_fps=SCH["dense_fps"], window_s=SCH["window_s"], causal=SCH["causal"])
             if perc is None:
-                perc = Perception(a.owl, a.sam2, device=a.device)
+                kw = {k: V[k] for k in ("det_thr", "redetect_every", "min_area") if k in V}
+                perc = Perception(a.owl, a.sam2, device=a.device, **kw)
             objs = list(spec.get("objects", []))
             if any("cube" in o for o in objs):  # detector vocabulary: every cube colour the scene may contain
                 objs = [o for o in objs if "cube" not in o] + ["red cube", "green cube", "blue cube"]
@@ -170,6 +191,10 @@ def main():
             tmp = tr_p + ".tmp"
             pickle.dump(tracks, open(tmp, "wb"))
             os.replace(tmp, tr_p)
+            mlog.write(json.dumps({"ep": ep, "tracks_sec": round(time.time() - t0, 1), "n_sampled": len(sample)}) + "\n")
+            mlog.flush()
+        if a.tracks_only:
+            continue
         cam = episode_cam(task, ep)
         b = UnsupBuilder(task, instr, spec, S, tracks, cam, stick=stick, demo_end=detect_demo_end(S))
         rows = b.labels()

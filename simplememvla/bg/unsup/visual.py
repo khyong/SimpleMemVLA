@@ -32,15 +32,18 @@ ROBOT_BAND_PX = 30  # detections whose box lies entirely in the top band are the
 
 
 def schedule(n_frames: int, event_frames: list[int], motion: np.ndarray | None = None, base_fps: float = 2.0,
-             dense_fps: float = 10.0, fps: float = 20.0, window_s: float = 1.0) -> list[int]:
+             dense_fps: float = 10.0, fps: float = 20.0, window_s: float = 1.0, causal: bool = False) -> list[int]:
+    """causal=True: dense sampling only *after* an event / motion onset (no look-ahead, D10 fix); with
+    event_frames=[] and motion=None it is a uniform base_fps schedule."""
     base = set(range(0, n_frames, int(round(fps / base_fps))))
     step = int(round(fps / dense_fps))
     w = int(round(window_s * fps))
     for f in event_frames:
-        base.update(range(max(0, f - w), min(n_frames, f + w + 1), step))
+        lo = f if causal else max(0, f - w)
+        base.update(range(lo, min(n_frames, f + w + 1), step))
     if motion is not None:
         for f in np.nonzero(motion)[0]:
-            base.update(range(max(0, f - step), min(n_frames, f + step + 1), step))
+            base.update(range(f if causal else max(0, f - step), min(n_frames, f + step + 1), step))
     base.add(n_frames - 1)
     return sorted(base)
 
